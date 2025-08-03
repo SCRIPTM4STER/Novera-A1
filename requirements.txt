@@ -1,0 +1,14 @@
+pygame
+asyncio
+edge-tts
+python-dotenv
+playsound
+AppOpener
+pywhatkit
+beautifulsoup4
+rich
+groq
+requests
+keyboard
+cohere
+googlesearch-python
