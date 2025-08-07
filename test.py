@@ -1,5 +1,8 @@
 from core.decision__Core import FirsLayerDMM
-from core.task__orchestrator import Task__Router
+from core.router import Task__Router
+# from engine.llm.openrouterLLM import Chat
+from engine.llm.groqLLM import Chat
+
 
 
 fn_keywords = [
@@ -19,15 +22,29 @@ command_types = {
     "exit": ["exit"],
 }
 
-#*NOTE - exicute the script
+
 if __name__ == '__main__':
-    #* Use a while loop to continuously prompt the user for input
     while True:
-        userInput = input("user >>> ") 
-        decisions = FirsLayerDMM(userInput)
+        query = input("user >>> ").strip()
+        if not query:
+            continue
+
+        # First-level decision
+        decisions = FirsLayerDMM(query)
+
+        # Task classification
         router = Task__Router(decisions, fn_keywords, command_types)
-        output, _ = router.Parse_Classify_Tasks()
-        value = router.set__priority(tasks=output)
-        distributor = router.router()
-        print(value)
-        print(router)
+        tasks, _ = router.Parse_Classify_Tasks()
+
+
+        # Route the task(s)
+        result = router.router()
+
+        # Handle LLM output
+        if result == "sent to LLM":
+            QueryFinal = query.replace("general ", "").replace("realtime ", "").strip()
+            # Clean query if needed
+            response = Chat(query=QueryFinal)
+            print(f"LLM >>> {response}")
+        elif query.lower() == "exit":
+            exit()

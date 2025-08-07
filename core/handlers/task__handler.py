@@ -1,23 +1,60 @@
 # handlers.py
 
-def handle_app_control(task):
-    print(f"[AppHandler] Performing '{task['fn']}' on: {task['task']}")
+class AppControlHandler:
+    def __init__(self):
+        self.success = False
 
-def handle_reminder(task):
-    print(f"[ReminderService] Scheduling reminder: {task['task']}")
+    def handle(self, task):
+        self.success = True
+        return self.success
 
-def handle_generation(task):
-    print(f"[ContentGenerator] Generating: {task['task']}")
 
-def handle_llm(task):
-    print(f"[LLMChat] Processing: {task['task']}")
+class ReminderHandler:
+    def __init__(self):
+        self.success = False
 
-def handle_search(task):
-    print(f"[WebSearch] Searching for: {task['task']}")
+    def handle(self, task):
+        print(f"[ReminderService] Scheduling reminder: {task['task']}")
+        self.success = True
+        return self.success
 
-def handle_system(task):
-    print(f"[SystemManager] Executing system-level task: {task['task']}")
 
-def handle_exit(task):
-    print("[ExitHandler] Terminating task flow.")
- 
+class GenerationHandler:
+    def __init__(self):
+        self.success = False
+
+    def handle(self, task):
+        print(f"[ContentGenerator] Generating: {task['task']}")
+        self.success = True
+        return self.success
+
+
+class LLMHandler:
+    def __init__(self):
+        self.LLM = False
+
+    def handle(self, task):
+        self.LLM = True
+        return self.LLM
+
+
+class SearchHandler:
+    def __init__(self):
+        self.success = False
+
+    def handle(self, task):
+        print(f"[WebSearch] Searching for: {task['task']}")
+        self.success = True
+        return self.success
+
+
+class SystemHandler:
+    def __init__(self):
+        self.success = False
+
+    def handle(self, task):
+        print(f"[SystemManager] Executing system-level task: {task['task']}")
+        self.success = True
+        return self.success
+
+

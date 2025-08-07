@@ -33,7 +33,7 @@ Delivers final responses through text, voice, or control logic. Built for low-la
 Learns and evolves from usage patterns and errors. Continuously optimizes decision paths and response quality over time.
 
 ---
-👉 To dive deeper into the architecture, check out the [System Map](map.md).
+👉 To dive deeper into the architecture, check out the [System Map](docs/system_Map.mkd).
 
 ## 🚀 Key Features
 

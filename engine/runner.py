@@ -1,0 +1,1 @@
+# Central entry point. Receives parsed task types from core/router.py and calls the right submodule.
