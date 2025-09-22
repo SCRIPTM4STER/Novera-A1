@@ -1,14 +1,17 @@
 from core.decision__Core import FirsLayerDMM
 from core.router import Task__Router
-# from engine.llm.openrouterLLM import Chat
-from engine.llm.groqLLM import Chat
+from engine.Config.config import CONFIG
+from engine.llm import LLMClient
 
 
+# Initialize LLM client once
+client = LLMClient.LLMClient(CONFIG)
 
+# Keywords and command types (copied from Task__Router docstring)
 fn_keywords = [
     "exit", "general", "realtime", "open", "close", "play",
     "generate image", "system", "content", "google search",
-    "youtube search", "reminder", 
+    "youtube search", "reminder",
 ]
 
 command_types = {
@@ -22,29 +25,32 @@ command_types = {
     "exit": ["exit"],
 }
 
+if __name__ == "__main__":
+    print("Novera AI ready. Type 'exit' to quit.\n")
 
-if __name__ == '__main__':
     while True:
         query = input("user >>> ").strip()
         if not query:
             continue
 
-        # First-level decision
+        # Step 1: First-level decision (cohere classifier)
         decisions = FirsLayerDMM(query)
 
-        # Task classification
+        # Step 2: Task classification
         router = Task__Router(decisions, fn_keywords, command_types)
         tasks, _ = router.Parse_Classify_Tasks()
 
-
-        # Route the task(s)
+        # Step 3: Route tasks
         result = router.router()
 
-        # Handle LLM output
-        if result == "sent to LLM":
-            QueryFinal = query.replace("general ", "").replace("realtime ", "").strip()
-            # Clean query if needed
-            response = Chat(query=QueryFinal)
-            print(f"LLM >>> {response}")
-        elif query.lower() == "exit":
-            exit()
+        print("Decisions:", decisions)
+        print("Router Result:", result)
+
+        # Step 4: If router says it's an LLM task, send to client
+        if result == "Is LLM":
+            for task in tasks:
+                if task["type"] == "llm":
+                    response = client.generate(prompt=task["task"])
+                    print("LLM Response:", response)
+                elif task["type"] == "app_control":
+                    

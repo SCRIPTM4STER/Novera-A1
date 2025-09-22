@@ -82,7 +82,9 @@ class Task__Router:
                 handler = handler_cls()
                 result = handler.handle(task)
                 if task_type == "llm" and getattr(handler, "LLM", False):
-                    return "sent to LLM"
+                    return "Is LLM"
+                elif task == "app_control" and getattr(handler, "App Control", False):
+                    return "Is App Control"
 
             except Exception as e:
-                print(f"[Router Error] Task failed: {e}")
+                print(f"[Router Error] Task failed: {e}") 

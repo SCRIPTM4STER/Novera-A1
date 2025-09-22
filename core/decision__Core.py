@@ -75,7 +75,7 @@ def FirsLayerDMM(prompt: str = "test"):
 
     #Create a streaming chat session with the Cohere model.
     stream = co.chat_stream(
-        model='command-r-plus',
+        model='command-a-03-2025',
         message=prompt,
         temperature=0.7,
         chat_history=ChatHistory,
