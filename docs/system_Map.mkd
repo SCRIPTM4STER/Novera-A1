@@ -1,6 +1,6 @@
 # ✅ Novera-A1 System Architecture Map
 
-This document outlines the finalized modular architecture of **Novera-A1**, designed for fast, intelligent, and humanlike interaction.
+This document outlines the modular architecture of **Novera-A1**, designed for fast, intelligent, and humanlike interaction.
 
 ---
 
@@ -8,93 +8,68 @@ This document outlines the finalized modular architecture of **Novera-A1**, desi
 
         ┌────────────────────────┐
         │ P1: Decision Core      │
-        │ (Reasoning + Intent)   │
+        │ (Reasoning + Intent)   │  core/decision__Core.py
         └─────────┬──────────────┘
                   ▼
         ┌────────────────────────┐ 
-        │ P2: Task Orchestrator  │ 
-        │ (Queue + Distribution) │ 
+        │ P2: Task Orchestrator  │  core/router.py
+        │ (Parse + Dispatch)     │  + core/handlers/task__handler.py
         └─────────┬──────────────┘ 
                   ▼
         ┌────────────────────────┐
-        │ P3: Knowledge Vault    │
-        │ (Memory + Facts + APIs)│
+        │ P3: Knowledge Vault    │  engine/llm/utils.py
+        │ (History + Caching)    │
         └─────────┬──────────────┘
         ┌────────────────────────┐ 
-        │ P4: Context Engine     │ 
-        │ (Emotion + Awareness)  │ 
+        │ P4: Context Engine     │  core/emotion__core.py
+        │ (Emotion + Awareness)  │  (in progress)
         └─────────┬──────────────┘ 
         ┌────────────────────────┐
-        │ P5: Action Layer       │
-        │ (Execute + Respond)    │
+        │ P5: Action Layer       │  engine/controle__unit/controller.py
+        │ (Execute + Respond)    │  + handlers
         └─────────┬──────────────┘
                   │                          
                   ▼                          
         ┌───────────────────────┐
-        │ P6: Feedback Loop     │
+        │ P6: Feedback Loop     │  planned
         │ (Learning + Tuning)   │
         └───────────────────────┘
 
 
 ---
 
-## 🔍 Refined Functional Overview
+## 🔍 Module Mapping & Status
 
-### **P1: Decision Core**  
-> 💡 Thinks before acting.
+- Decision Core: Ready — `core/decision__Core.py`
+- Router: Ready — `core/router.py`
+- Handlers: Basic (in progress) — `core/handlers/task__handler.py`
+- Emotion Core (in progress): `core/emotion__core.py`
+- State Manager (experimental): `core/handlers/state__manager.py`
+- Controller/Portal: MVP — `engine/controle__unit/controller.py`
+- LLM Client: Ready — `engine/llm/LLMClient.py`, `engine/llm/Client__loader.py`
+- Utilities (history/logging): Ready — `engine/llm/utils.py`
+- Config: Ready — `engine/Config/config.py`, `engine/Config/logger.py`, `engine/Config/instructions.py`
 
-- Evaluates input and determines goals  
-- Mimics human reasoning, tone, and timing  
-- Central to creating "natural" intelligence
+Formatting for in-progress items:
+`Component (in progress): {short description}`
 
----
-
-### **P2: Task Orchestrator**  
-> ⚙️ Efficient execution planning
-
-- Manages async micro-tasks  
-- Distributes workloads for speed and scalability  
-- Keeps the system agile and responsive
-
----
-
-### **P3: Knowledge Vault**  
-> 📚 Smart memory & facts engine
-
-- Preloaded and dynamic real-time knowledge  
-- Caches frequent lookups  
-- Integrates APIs and embeddings
+- Emotion Core (in progress): Planned emotional state tracking and adaptive tone control.
+- Handlers (in progress): Extend stubs to real integrations (schedulers, search APIs, media, etc.).
+- Feedback Loop (planned): Telemetry-driven tuning and self-adjustment.
 
 ---
 
-### **P4: Context Engine**  
-> 🧠 Makes the AI feel alive
+## 🔀 Decision Core → Router Flow
 
-- Tracks user emotion and conversation flow  
-- Influences tone, phrasing, and decision behavior  
-- Enables emotionally adaptive responses
-
----
-
-### **P5: Action Layer**  
-> ⚡ Execution and response center
-
-- Delivers final output via voice, text, or logic  
-- Supports multimodal interfaces  
-- Optimized for minimal latency
-
----
-
-### **P6: Feedback Loop**  
-> 🔁 Autonomous learning system
-
-- Self-monitors and adapts over time  
-- Refines internal behavior via usage patterns  
-- Enables long-term evolution and optimization
+1. User query enters Decision Core (`core/decision__Core.py`)
+2. Core emits normalized directives (e.g., `general …`, `open chrome`)
+3. Router (`core/router.py`) parses directives → task types
+4. Router dispatches to handler stubs
+5. Handlers perform action (current MVP) or return capability flags
 
 ---
 
 ## 📎 Summary
 
-This architecture allows Novera-A1 to combine **speed**, **intelligence**, and **emotional depth**, offering a powerful, humanlike assistant experience. Each part works in tandem to ensure smooth, intelligent interactions with minimal delay.
+This architecture combines **speed**, **intelligence**, and **emotional depth**. Each part works in tandem to ensure smooth, intelligent interactions with minimal delay.
 

@@ -1,0 +1,103 @@
+# 🧩 Novera-A1 LLM Client Guide
+
+This guide explains how the LLM client layer is structured and how to configure and use it.
+
+---
+
+## 🎯 Goals
+
+- Provider-agnostic interface (Groq, Cohere, OpenAI)
+- Centralized configuration and logging
+- Lightweight chat history handling for better context
+
+---
+
+## 📦 Modules
+
+- `engine/llm/LLMClient.py`: High-level client with a unified `generate(prompt)` API
+- `engine/llm/Client__loader.py`: Provider registry that returns initialized SDK clients
+- `engine/llm/utils.py`: History and logging helpers
+- `engine/Config/config.py`: Configuration and environment validation
+
+---
+
+## ⚙️ Configuration
+
+Configuration is defined in `engine/Config/config.py` under `CONFIG["LLM"][0]`.
+
+Key fields:
+- `function.name`: provider name (`groq`, `cohere`, `openai`)
+- `parameters.api_key`: API key loaded from `.env`
+- `parameters.model`: model identifier (provider specific)
+- `parameters.system_prompt`: system prompt to steer behavior
+- `history.limit` and `history.path`: chat history window and file path
+- `context.use_short_term_memory` and `short_term_limit`: transcript window in prompts
+- `logging.enabled`, `log_path`, `level`: structured logging
+- `personalization.user_profile`: user metadata and history preferences
+
+Environment variables are validated at import time via `validate_env()`:
+- `CohereAPIKey` (required)
+- `GroqAPIKey` (required)
+
+---
+
+## 🔌 Providers
+
+Provider SDK initialization is handled by the registry in `engine/llm/Client__loader.py`:
+
+- `groq` → `Groq(api_key=...)`
+- `cohere` → `cohere.Client(api_key=...)`
+- `openai` → `openai.OpenAI(api_key=...)` (if installed)
+
+Switch providers by changing `CONFIG["LLM"][0]["function"]["name"]`.
+
+---
+
+## 🧠 History & Context
+
+- Short-term history is inserted into the user message transcript via `format_recent_history()` with the last `short_term_limit` turns.
+- On successful responses, `append_history()` persists `{timestamp, user, query, response}` to `Data/Chatlog.json`.
+- History is optional and controlled by `reference_chat_history` and `save_history` flags.
+
+---
+
+## 🧪 Usage
+
+```python
+from engine.llm.LLMClient import LLMClient
+from engine.Config.config import CONFIG
+
+client = LLMClient(CONFIG)
+print(client.generate("Summarize the repo structure in one paragraph."))
+```
+
+Behavior specifics:
+- Groq/OpenAI: chat-style calls with separate system and user messages
+- Cohere: single `generate()` call with system prompt inlined before user message
+
+---
+
+## 🔁 Flow
+
+1) Build transcript from recent history (if enabled)
+2) Prepare provider-specific request
+3) Send request and extract text content safely
+4) Log outcome and append to history (if enabled)
+
+---
+
+## 📋 Notes
+
+- Keep your `.env` based on `.env.example` and ensure required keys are present
+- For long-term memory, configure `context.use_long_term_memory` and `long_term_path`
+- Logging can be disabled via `logging.enabled=False`
+
+---
+
+## 🚧 Future Enhancements (in progress)
+
+- Streaming abstraction for providers with token streaming
+- Tool-calling interface and function calling adapters
+- Retry/backoff and provider failover
+
+

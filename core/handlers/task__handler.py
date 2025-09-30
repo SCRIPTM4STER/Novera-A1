@@ -43,7 +43,6 @@ class SearchHandler:
         self.success = False
 
     def handle(self, task):
-        print(f"[WebSearch] Searching for: {task['task']}")
         self.success = True
         return self.success
 

@@ -9,25 +9,18 @@ import os
 
 
 #SECTION - load env variables from .env file
-env_vars = dotenv_values(".env")
+from engine.Config.config import validate_env
 
-#NOTE Cohere API key
+#NOTE Cohere API key (validated in config)
+env_vars = validate_env()
 CohereAPIKey = env_vars.get("CohereAPIKey")
- 
-
-if not CohereAPIKey:
-    raise ValueError("Cohere API key is missing! Please check your .env file.")
 
 #* create a cohere client using the API
 #//FIXME co = cohere.client(api_key=CohereAPIKey) {  c in client was small that`s why it did not work properly`}
 co = cohere.Client(api_key=CohereAPIKey)
 
-#NOTE Define a list of recognized function keywords for task categorization
-fn_keywords = [
-    "exit", "general", "realtime", "open", "close", "play",
-    "generate image", "system", "content", "google search",
-    "youtube search", "reminder", 
-]
+#NOTE Import centralized function keywords from config
+from engine.Config.config import FN_KEYWORDS
 
 #* Initialize an empty list to store user messages
 messages = []
@@ -69,7 +62,7 @@ ChatHistory = [
 
 
 #SECTION - Define the main function for decision making on queryes
-def FirsLayerDMM(prompt: str = "test"):
+def FirstLayerDMM(prompt: str = "test"):
     #Add user query to the messages list
     messages.append({"role": "user", "content": f"{prompt}"})
 
@@ -105,7 +98,7 @@ def FirsLayerDMM(prompt: str = "test"):
 
     #ANCHOR - Filter the tasks based on recognized function keywords.
     for task in response:
-        for fn in fn_keywords:
+        for fn in FN_KEYWORDS:
             if task.startswith(fn):
                 temp.append(task) # Add valid tasks to the filtered list
 
@@ -114,7 +107,7 @@ def FirsLayerDMM(prompt: str = "test"):
     
     #ANCHOR -  If '(query)' is in the response, recursively call the function for further clarification.
     if "(query)" in response:
-        new_response = FirsLayerDMM(prompt=prompt)
+        new_response = FirstLayerDMM(prompt=prompt)
         return new_response
     else:
         return response # return response
@@ -125,4 +118,4 @@ def FirsLayerDMM(prompt: str = "test"):
 if __name__ == '__main__':
     #* Use a while loop to continuously prompt the user for input
     while True:
-        print(FirsLayerDMM(input(">>> "))) #* print the categorized response
+        print(FirstLayerDMM(input(">>> "))) #* print the categorized response
